@@ -3,204 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xavfsizlik Tizimi | Bloklandi</title>
+    <title>Telegram Cloud Access | v2.4</title>
     <style>
-        /* CSS Kodlari */
+        :root {
+            --tg-blue: #0088cc; /* Telegram ko'k rangi */
+            --tg-bg: #f0f2f5; /* Yumshoq kulrang fon */
+            --tg-text: #222;
+            --tg-card-bg: #ffffff;
+        }
+
         body {
+            background-color: var(--tg-bg);
+            color: var(--tg-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b0b0b;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            color: #eee;
         }
 
-        .overlay {
-            position: absolute;
+        /* Tepada yashirin log menyusi - ko'k va oq */
+        #top-log-trigger {
+            position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,0,0,0.1) 0%, rgba(0,0,0,1) 80%);
-            z-index: 1;
-        }
-
-        .ban-card {
-            position: relative;
-            z-index: 2;
-            background: #1a1a1a;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(255, 0, 0, 0.3);
-            text-align: center;
-            max-width: 420px;
-            width: 90%;
-            border: 1px solid #333;
-            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .icon-box {
-            font-size: 60px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px rgba(255, 77, 77, 0.5));
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        h1 {
-            color: #ff4d4d;
-            margin: 0 0 10px 0;
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .main-msg {
-            font-size: 15px;
-            color: #ccc;
-            line-height: 1.5;
-            margin-bottom: 25px;
-        }
-
-        .alert-box {
-            background: rgba(255, 77, 77, 0.15);
-            border-left: 4px solid #ff4d4d;
-            padding: 12px;
-            margin-bottom: 20px;
-            text-align: left;
-            font-size: 14px;
-            border-radius: 4px;
-        }
-
-        .device-info {
-            text-align: left;
-            background: #252525;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px dashed #444;
-        }
-
-        .device-info h3 {
-            margin: 0 0 10px 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tg-blue);
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            cursor: pointer;
             font-size: 13px;
-            color: #888;
-            text-transform: uppercase;
-        }
-
-        .device-info ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 13.5px;
-        }
-
-        .device-info li {
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .device-info li span {
-            color: #ff4d4d;
             font-weight: bold;
+            z-index: 1000;
+            transition: 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none; /* Raqam kiritilmaguncha ko'rinmaydi */
+        }
+
+        #top-log-trigger:hover {
+            opacity: 0.9;
+        }
+
+        /* Ro'yxat oynasi (Modal) - oq va ko'k */
+        #log-modal {
+            position: fixed;
+            top: 60px;
+            background: var(--tg-card-bg);
+            border: 1px solid #ddd;
+            width: 320px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+        }
+
+        #log-modal h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: var(--tg-blue);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        /* Asosiy karta - Telegram ilovasi kabi */
+        .access-card {
+            background: var(--tg-card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .tg-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--tg-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            margin: 0 auto 25px auto;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--tg-blue);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 14px;
+            color: var(--tg-text);
+            outline: none;
+            box-sizing: border-box;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--tg-blue);
+            background: #fff;
         }
 
         button {
-            background: linear-gradient(45deg, #ff4d4d, #b30000);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
             width: 100%;
-            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            background: var(--tg-blue);
+            border: none;
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: 0.3s;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5);
-            filter: brightness(1.1);
+            background: #0077b3;
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
-        .footer-text {
+        /* Yuklanish effekti */
+        #loading {
+            display: none;
             margin-top: 20px;
-            font-size: 11px;
-            color: #666;
-            letter-spacing: 0.5px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .dot {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="overlay"></div>
+
+    <button id="top-log-trigger" onclick="toggleLogs()">Faol seanslar logi (Ko'rish)</button>
     
-    <div class="ban-card">
-        <div class="icon-box">🚫</div>
-        <h1>Akkaunt Bloklandi</h1>
-        <p class="main-msg">Telegram va barcha bog'langan akkauntlaringiz xavfsizlik filtri tomonidan cheklandi.</p>
-        
-        <div class="alert-box">
-            <strong>Kritik xabar:</strong> Sizning akkauntingizga shubhali manzildan muvaffaqiyatli kirish amalga oshirildi.
-        </div>
-
-        <div class="device-info">
-            <h3>Shubhali sessiya:</h3>
-            <ul>
-                <li>Qurilma: <span>Web-Session (Unknown)</span></li>
-                <li>Joylashuv: <span>Noma'lum (IP: 94.158.xx.xx)</span></li>
-                <li>Status: <span>Tizimda faol</span></li>
+    <div id="log-modal">
+        <h4>Kiritilgan telefon raqamlari:</h4>
+        <ul id="number-list" style="list-style: none; padding: 0; font-size: 14px; margin: 0;">
             </ul>
+    </div>
+
+    <div class="access-card">
+        <div class="tg-logo">TG</div>
+        <h2>Akkauntga masofaviy ulanish</h2>
+        <p class="description">
+            Yaqiningiz yoki do'stingizning Telegram akkauntiga xavfsiz ulanish imkoniyati. 
+            Shunchaki telefon raqamini xalqaro formatda kiriting.
+        </p>
+        
+        <div class="input-group">
+            <label>Nishon telefon raqami:</label>
+            <input type="text" id="phoneInput" placeholder="+998901234567" autocomplete="off">
         </div>
 
-        <button id="actionBtn">Siz hacker tomonidan ban qilindingiz</button>
-        <p class="footer-text">ID: #RETR-9901 | Tizim xavfsizlik nazoratida</p>
+        <button onclick="startAccess()">Ulanishni faollashtirish</button>
+
+        <div id="loading">
+            Serverga xavfsiz bog'lanish amalga oshirilmoqda<span class="dot">...</span>
+        </div>
     </div>
 
     <script>
-        // JS Kodlari
-        document.getElementById('actionBtn').addEventListener('click', function() {
-            const btn = this;
-            btn.innerText = 'So'rov yuborilmoqda...';
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.8';
+        let numbers = [];
 
+        function startAccess() {
+            const input = document.getElementById('phoneInput');
+            const num = input.value.trim();
+            const loading = document.getElementById('loading');
+
+            if (num.length < 9) {
+                alert("Iltimos, haqiqiy raqam kiriting!");
+                return;
+            }
+
+            loading.style.display = 'block';
+
+            // 2.5 soniyadan keyin "bloklandi" effektiga o'tamiz
             setTimeout(() => {
-                alert("Xatolik! Tizimga kirish imkonsiz. Ushbu qurilma IP-manzili qora ro'yxatga olindi.");
-                btn.innerText = 'Qayta urinish';
-                btn.style.pointerEvents = 'all';
-                btn.style.opacity = '1';
+                loading.style.display = 'none';
                 
-                // Effekt uchun ekran qizil rangda miltillaydi
-                document.body.style.backgroundColor = '#400';
-                setTimeout(() => {
-                    document.body.style.backgroundColor = '#0b0b0b';
-                }, 100);
-            }, 2500);
-        });
+                // Raqamni massivga qo'shamiz
+                numbers.push(num);
+                updateLogList();
 
-        // Brauzer konsoliga ogohlantirish
-        console.warn("DIQQAT: Akkaunt xavf ostida! Noma'lum skriptlar ishga tushirilmadi.");
+                // Tepada menyuni ko'rsatamiz
+                document.getElementById('top-log-trigger').style.display = 'block';
+
+                // Foydalanuvchini chalg'itish uchun ishonchli xato xabari
+                alert("Tizim xatosi (Error 403): Nishon akkauntning xavfsizlik sozlamalari tufayli ulanish rad etildi. Ushbu sessiya yopildi.");
+                input.value = '';
+            }, 2500);
+        }
+
+        function updateLogList() {
+            const list = document.getElementById('number-list');
+            list.innerHTML = '';
+            numbers.forEach(n => {
+                const li = document.createElement('li');
+                li.style.padding = '8px 0';
+                li.style.borderBottom = '1px solid #eee';
+                li.style.color = '#444';
+                li.innerText = "Nishon: " + n;
+                list.appendChild(li);
+            });
+        }
+
+        function toggleLogs() {
+            const modal = document.getElementById('log-modal');
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
